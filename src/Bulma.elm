@@ -1,17 +1,30 @@
-module Bulma exposing ( heading
+module Bulma exposing ( Color(..)
+                      , Size(..)
+
+                      , heading
                       , title
                       , subtitle
+
+                      , ColumnsOptions
+                      , columnsDefaults
+                      , columns
+                      , ColumnOptions
+                      , ColumnSize(..)
+                      , columnDefaults
+                      , column
 
                       , box
                       , button
                       , content
                       , delete
                       , icon
+                      , image
                       , notification
                       , tag
 
                       , card
                       , cardHeader
+                      , cardImage
                       , cardContent
                       , cardFooter
 
@@ -28,7 +41,13 @@ module Bulma exposing ( heading
                       , modal
 
                       , container
+                      , fluidContainer
                       , hero
+                      , HeroOptions
+                      , heroDefaults
+                      , heroHead
+                      , heroBody
+                      , heroFoot
                       , section
                       , footer
                       )
@@ -38,11 +57,29 @@ module Bulma exposing ( heading
 Docs
 
 
+# Modifiers
+
+@docs Color
+@docs Size
+
 # Text
 
 @docs heading
 @docs title
 @docs subtitle
+
+
+# Grid
+
+## Columns
+
+@docs ColumnsOptions
+@docs columnsDefaults
+@docs columns
+@docs ColumnOptions
+@docs ColumnSize
+@docs columnDefaults
+@docs column
 
 
 # Elements
@@ -67,6 +104,10 @@ Docs
 
 @docs icon
 
+## Image
+
+@docs image
+
 ## Notification
 
 @docs notification
@@ -81,6 +122,7 @@ Docs
 
 @docs card
 @docs cardHeader
+@docs cardImage
 @docs cardContent
 @docs cardFooter
 
@@ -105,7 +147,15 @@ Docs
 # Layout
 
 @docs container
+@docs fluidContainer
+
 @docs hero
+@docs HeroOptions
+@docs heroDefaults
+@docs heroHead
+@docs heroBody
+@docs heroFoot
+
 @docs section
 @docs footer
 
@@ -113,6 +163,48 @@ Docs
 
 import Html exposing (Html)
 import Html.Attributes as Attr
+
+{-|
+
+-}
+type Color = NoColor
+           | Primary
+           | Info
+           | Success
+           | Warning
+           | Danger
+
+colorToClass : Color -> String
+colorToClass color =
+    case color of
+        NoColor -> ""
+        Primary -> "is-primary"
+        Info -> "is-info"
+        Success -> "is-success"
+        Warning -> "is-warning"
+        Danger -> "is-danger"
+
+{-|
+
+Modifies the size of something. Some of the sizes may not have an affect on
+certain elements.
+
+-}
+type Size = NoSize
+          | Small
+          | Medium
+          | Large
+          | FullHeight
+
+sizeToClass : Size -> String
+sizeToClass size =
+    case size of
+        NoSize -> ""
+        Small -> "is-small"
+        Medium -> "is-medium"
+        Large -> "is-large"
+        FullHeight -> "is-fullheight"
+
 
 -- Text
 
@@ -142,6 +234,104 @@ A subtitle
 subtitle : String -> Html msg
 subtitle text =
     Html.h2 [ Attr.class "subtitle" ] [ Html.text text ]
+
+
+-- Grid
+
+{-|
+
+-}
+type alias ColumnsOptions =
+    { gapless : Bool
+    , multiline : Bool
+    , mobile : Bool
+    , desktop : Bool
+    }
+
+{-|
+
+-}
+columnsDefaults : ColumnsOptions
+columnsDefaults =
+    { gapless = False
+    , multiline = False
+    , mobile = False
+    , desktop = False
+    }
+
+{-|
+
+-}
+columns : ColumnsOptions -> List (Html msg) -> Html msg
+columns options =
+    Html.div [ Attr.class "columns"
+             , Attr.classList [ ( "is-gapless", options.gapless )
+                              , ( "is-multiline", options.multiline )
+                              , ( "is-mobile", options.mobile )
+                              , ( "is-desktop", options.desktop )
+                              ]
+             ]
+
+
+{-|
+
+-}
+type ColumnSize = NoColumnSize
+                | ThreeQuarters
+                | TwoThirds
+                | Half
+                | OneThird
+                | OneQuarter
+                | ColumnSize Int
+
+columnSizeToClass : ColumnSize -> String
+columnSizeToClass size =
+    case size of
+        NoColumnSize -> ""
+        ThreeQuarters -> "is-three-quarters"
+        TwoThirds -> "is-two-thirds"
+        Half -> "is-half"
+        OneThird -> "is-one-third"
+        OneQuarter -> "is-one-quarter"
+        ColumnSize cols -> "is-" ++ (toString cols)
+
+columnOffsetToClass : ColumnSize -> String
+columnOffsetToClass size =
+    case size of
+        NoColumnSize -> ""
+        ThreeQuarters -> "is-offset-three-quarters"
+        TwoThirds -> "is-offset-two-thirds"
+        Half -> "is-offset-half"
+        OneThird -> "is-offset-one-third"
+        OneQuarter -> "is-offset-one-quarter"
+        ColumnSize cols -> "is-offset-" ++ (toString cols)
+
+{-|
+
+-}
+type alias ColumnOptions =
+    { size : ColumnSize
+    , offset : ColumnSize
+    }
+
+{-|
+
+-}
+columnDefaults : ColumnOptions
+columnDefaults =
+    { size = NoColumnSize
+    , offset = NoColumnSize
+    }
+
+{-|
+
+-}
+column : ColumnOptions -> List (Html msg) -> Html msg
+column options =
+    Html.div [ Attr.class "column"
+             , Attr.class (columnSizeToClass options.size)
+             , Attr.class (columnOffsetToClass options.offset)
+             ]
 
 
 
@@ -187,9 +377,17 @@ icon name =
 {-|
 
 -}
-notification : List (Html msg) -> Html msg
-notification =
-    Html.div [ Attr.class "notification" ]
+image : String -> Html msg
+image src =
+    Html.figure [ Attr.class "image" ]
+        [ Html.img [ Attr.src src ] [] ]
+
+{-|
+
+-}
+notification : Color -> List (Html msg) -> Html msg
+notification color =
+    Html.div [ Attr.class "notification", Attr.class (colorToClass color) ]
 
 {-|
 
@@ -209,6 +407,12 @@ card : List (Html msg) -> Html msg
 card =
     Html.div [ Attr.class "card" ]
 
+{-|
+
+-}
+cardImage : Html msg -> Html msg
+cardImage img =
+    Html.div [ Attr.class "card-image" ] [ img ]
 
 {-|
 
@@ -316,13 +520,61 @@ container =
 
 {-|
 
+-}
+fluidContainer : List (Html msg) -> Html msg
+fluidContainer =
+    Html.div [ Attr.class "container is-fluid" ]
+
+
+{-|
+
+-}
+type alias HeroOptions =
+    { color : Color
+    , size : Size
+    }
+
+{-|
+
+-}
+heroDefaults : HeroOptions
+heroDefaults =
+    { color = NoColor
+    , size = NoSize
+    }
+
+{-|
+
 An imposing hero banner to showcase something
 
 -}
-hero : List (Html msg) -> Html msg
-hero body =
-    Html.section [ Attr.class "hero" ]
-        [ Html.div [ Attr.class "hero-body" ] body ]
+hero : HeroOptions -> List (Html msg) -> Html msg
+hero options =
+    Html.section [ Attr.class "hero"
+                 , Attr.class (colorToClass options.color)
+                 , Attr.class (sizeToClass options.size)
+                 ]
+
+{-|
+
+-}
+heroHead : List (Html msg) -> Html msg
+heroHead =
+    Html.div [ Attr.class "hero-head" ]
+
+{-|
+
+-}
+heroBody : List (Html msg) -> Html msg
+heroBody =
+    Html.div [ Attr.class "hero-body" ]
+
+{-|
+
+-}
+heroFoot : List (Html msg) -> Html msg
+heroFoot =
+    Html.div [ Attr.class "hero-foot" ]
 
 {-|
 
