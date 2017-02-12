@@ -62,6 +62,30 @@ view model =
                          ]
                    ]
                ]
+        , Bulma.section
+            [ Bulma.container
+                  [ Bulma.box
+                        [ Bulma.media
+                              [ Bulma.mediaLeft [ Html.text "left" ]
+                              , Bulma.mediaContent [ Html.text "content" ]
+                              , Bulma.mediaRight [ Html.text "right" ]
+                              ]
+                        ]
+                  ]
+            ]
+        , Bulma.section
+            [ Bulma.container
+                  [ Bulma.button [] [ Html.text "Button" ]
+                  ]
+            ]
+        , Bulma.section
+            [ Bulma.container
+                  [ Bulma.content
+                        [ Html.p [] [ Html.text "This is a content block" ]
+                        ]
+                  , Bulma.tag "tag"
+                  ]
+            ]
         , Bulma.footer
             [ Bulma.container
                   [ Html.p [] [ Html.text "This is a footer " ]
