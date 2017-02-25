@@ -4,7 +4,8 @@
     "repository": "https://github.com/hawx/elm-bulma.git",
     "license": "MIT",
     "source-directories": [
-        "./src"
+        "./src",
+        "./example"
     ],
     "exposed-modules": [
         "Bulma"

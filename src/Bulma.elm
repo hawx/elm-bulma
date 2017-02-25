@@ -13,11 +13,19 @@ module Bulma exposing ( Color(..)
                       , columnDefaults
                       , column
 
+                      , TileRole(..)
+                      , TileOptions
+                      , tileDefaults
+                      , tile
+
                       , box
+                      , ButtonOptions
+                      , buttonDefaults
                       , button
                       , content
                       , delete
                       , icon
+                      , ImageSize(..)
                       , image
                       , notification
                       , tag
@@ -27,6 +35,7 @@ module Bulma exposing ( Color(..)
                       , cardImage
                       , cardContent
                       , cardFooter
+                      , cardFooterItem
 
                       , level
                       , levelLeft
@@ -39,6 +48,16 @@ module Bulma exposing ( Color(..)
                       , mediaRight
 
                       , modal
+
+                      , nav
+                      , navLeft
+                      , navCenter
+                      , navRight
+                      , navItem
+
+                      , TabsOptions
+                      , tabsDefaults
+                      , tabs
 
                       , container
                       , fluidContainer
@@ -81,6 +100,12 @@ Docs
 @docs columnDefaults
 @docs column
 
+## Tiles
+
+@docs TileRole
+@docs TileOptions
+@docs tileDefaults
+@docs tile
 
 # Elements
 
@@ -90,6 +115,8 @@ Docs
 
 ## Button
 
+@docs ButtonOptions
+@docs buttonDefaults
 @docs button
 
 ## Content
@@ -106,6 +133,7 @@ Docs
 
 ## Image
 
+@docs ImageSize
 @docs image
 
 ## Notification
@@ -125,6 +153,7 @@ Docs
 @docs cardImage
 @docs cardContent
 @docs cardFooter
+@docs cardFooterItem
 
 ## Level
 
@@ -143,6 +172,20 @@ Docs
 ## Modal
 
 @docs modal
+
+## Nav
+
+@docs nav
+@docs navLeft
+@docs navCenter
+@docs navRight
+@docs navItem
+
+## Tabs
+
+@docs TabsOptions
+@docs tabsDefaults
+@docs tabs
 
 # Layout
 
@@ -334,6 +377,56 @@ column options =
              ]
 
 
+{-|
+
+-}
+type TileRole = NoRole
+              | Parent
+              | Ancestor
+              | Child
+
+{-|
+
+-}
+type alias TileOptions =
+    { size : ColumnSize
+    , role : TileRole
+    , vertical : Bool
+    , class : String
+    }
+
+{-|
+
+-}
+tileDefaults : TileOptions
+tileDefaults =
+    { size = NoColumnSize
+    , vertical = False
+    , role = NoRole
+    , class = ""
+    }
+
+
+tileOptionsClass : TileOptions -> Html.Attribute msg
+tileOptionsClass { size, vertical, role, class } =
+    Attr.classList
+        [ ( columnSizeToClass size, True )
+        , ( "is-vertical", vertical )
+        , ( "is-ancestor", role == Ancestor )
+        , ( "is-parent", role == Parent )
+        , ( "is-child", role == Child )
+        , ( class, class /= "" )
+        ]
+
+{-|
+
+-}
+tile : TileOptions -> List (Html msg) -> Html msg
+tile options =
+    Html.div [ Attr.class "tile", tileOptionsClass options ]
+
+
+
 
 -- Elements
 
@@ -347,9 +440,43 @@ box =
 {-|
 
 -}
-button : List (Html.Attribute msg) -> List (Html msg) -> Html msg
-button attrs =
-    Html.a (Attr.class "button" :: attrs)
+type alias ButtonOptions =
+    { color : Color
+    , size : Size
+    , outlined : Bool
+    , inverted : Bool
+    , loading : Bool
+    , disabled : Bool
+    }
+
+{-|
+
+-}
+buttonDefaults : ButtonOptions
+buttonDefaults =
+    { color = NoColor
+    , size = NoSize
+    , outlined = False
+    , inverted = False
+    , loading = False
+    , disabled = False
+    }
+
+{-|
+
+-}
+button : ButtonOptions -> List (Html msg) -> Html msg
+button options =
+    Html.a [ Attr.class "button"
+           , Attr.class (colorToClass options.color)
+           , Attr.class (sizeToClass options.size)
+           , Attr.classList
+               [ ("is-outlined", options.outlined)
+               , ("is-inverted", options.inverted)
+               , ("is-loading", options.loading)
+               , ("is-disabled", options.disabled)
+               ]
+           ]
 
 {-|
 
@@ -377,9 +504,45 @@ icon name =
 {-|
 
 -}
-image : String -> Html msg
-image src =
-    Html.figure [ Attr.class "image" ]
+type ImageSize = NoImageSize
+               | Square16
+               | Square24
+               | Square32
+               | Square48
+               | Square64
+               | Square96
+               | Square128
+               | IsSquare
+               | IsOneByOne
+               | IsFourByThree
+               | IsThreeByTwo
+               | IsSixteenByNine
+               | IsTwoByOne
+
+imageSizeToClass : ImageSize -> String
+imageSizeToClass size =
+    case size of
+        NoImageSize -> ""
+        Square16 -> "is-16x16"
+        Square24 -> "is-24x24"
+        Square32 -> "is-32x32"
+        Square48 -> "is-48x48"
+        Square64 -> "is-64x64"
+        Square96 -> "is-96x96"
+        Square128 -> "is-128x128"
+        IsSquare -> "is-square"
+        IsOneByOne -> "is-1by1"
+        IsFourByThree -> "is-4by3"
+        IsThreeByTwo -> "is-3by2"
+        IsSixteenByNine -> "is-16by9"
+        IsTwoByOne -> "is-2by1"
+
+{-|
+
+-}
+image : ImageSize -> String -> Html msg
+image size src =
+    Html.figure [ Attr.class "image", Attr.class (imageSizeToClass size) ]
         [ Html.img [ Attr.src src ] [] ]
 
 {-|
@@ -438,6 +601,12 @@ cardFooter : List (Html msg) -> Html msg
 cardFooter =
     Html.div [ Attr.class "card-footer" ]
 
+{-|
+
+-}
+cardFooterItem : List (Html.Attribute msg) -> List (Html msg) -> Html msg
+cardFooterItem attrs =
+    Html.a (Attr.class "card-footer-item" :: attrs)
 
 {-|
 
@@ -506,6 +675,86 @@ modal content =
         , Html.button [ Attr.class "modal-close" ] []
         ]
 
+{-|
+
+-}
+nav : List (Html msg) -> Html msg
+nav =
+    Html.nav [ Attr.class "nav" ]
+
+{-|
+
+-}
+navLeft : List (Html msg) -> Html msg
+navLeft =
+    Html.div [ Attr.class "nav-left" ]
+
+{-|
+
+-}
+navCenter : List (Html msg) -> Html msg
+navCenter =
+    Html.div [ Attr.class "nav-center" ]
+
+{-|
+
+-}
+navRight : List (Html msg) -> Html msg
+navRight =
+    Html.div [ Attr.class "nav-right" ]
+
+{-|
+
+-}
+navItem : Bool -> List (Html msg) -> Html msg
+navItem active =
+    Html.a [ Attr.class "nav-item", Attr.classList [("is-active", active)] ]
+
+{-|
+
+-}
+type alias TabsOptions =
+    { centered : Bool
+    , right : Bool
+    , size : Size
+    , boxed : Bool
+    , toggle : Bool
+    , fullwidth : Bool
+    }
+
+{-|
+
+-}
+tabsDefaults : TabsOptions
+tabsDefaults =
+    { centered = False
+    , right = False
+    , size = NoSize
+    , boxed = False
+    , toggle = False
+    , fullwidth = False
+    }
+
+{-|
+
+-}
+tabs : TabsOptions -> List (Bool, List (Html msg)) -> Html msg
+tabs options items =
+    Html.div [ Attr.class "tabs"
+             , Attr.class (sizeToClass options.size)
+             , Attr.classList
+                 [ ("is-centered", options.centered)
+                 , ("is-right", options.right)
+                 , ("is-boxed", options.boxed)
+                 , ("is-toggle", options.toggle)
+                 , ("is-fullwidth", options.fullwidth)
+                 ]
+             ]
+        [ Html.ul [] <|
+              List.map (\(active, contents) ->
+                            Html.li [ Attr.classList [("is-active", active)] ] contents
+                       ) items
+        ]
 
 -- Layout
 
@@ -581,9 +830,9 @@ heroFoot =
 A simple container to divide your page into sections
 
 -}
-section : List (Html msg) -> Html msg
-section =
-    Html.section [ Attr.class "section" ]
+section : Size -> List (Html msg) -> Html msg
+section size =
+    Html.section [ Attr.class "section", Attr.class (sizeToClass size) ]
 
 {-|
 
